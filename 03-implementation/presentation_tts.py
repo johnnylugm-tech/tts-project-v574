@@ -15,11 +15,11 @@ import tempfile
 import shutil
 from typing import List, Optional, Dict
 
-from .config_manager import ConfigManager, TTSConfig
-from .text_processor import TextProcessor
-from .async_synthesizer import AsyncSynthesizer
-from .audio_merger import AudioMerger
-from .error_handler import (
+from config_manager import ConfigManager, TTSConfig
+from text_processor import TextProcessor
+from async_synthesizer import AsyncSynthesizer
+from audio_merger import AudioMerger
+from error_handler import (
     ErrorHandler, 
     TTSError, 
     InputError, 

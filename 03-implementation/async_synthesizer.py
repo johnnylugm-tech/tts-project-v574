@@ -17,7 +17,9 @@ try:
     import edge_tts
     from edge_tts import Communicate, Voice
 except ImportError:
-    raise ImportError("edge-tts 尚未安裝，請執行: pip install edge-tts")
+    edge_tts = None
+    Communicate = None
+    Voice = None
 
 from config_manager import TTSConfig
 from error_handler import NetworkError, ServiceError, TTSError

@@ -13,12 +13,12 @@ Phase 3 實作 - 單元測試
 import pytest
 import json
 import tempfile
-import os
+
 import sys
-import os
+
 
 # 修正 import 路徑
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from config_manager import ConfigManager, TTSConfig
 
 

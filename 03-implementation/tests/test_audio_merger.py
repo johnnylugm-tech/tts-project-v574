@@ -10,14 +10,14 @@ Phase 3 實作 - 單元測試
 """
 
 import pytest
-import os
+
 import tempfile
 from unittest.mock import Mock, patch, MagicMock
 import sys
-import os
+
 
 # 修正 import 路徑
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 sys.modules['ffmpeg'] = MagicMock()
 
 from audio_merger import AudioMerger

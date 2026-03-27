@@ -17,7 +17,7 @@ from typing import List, Optional
 try:
     import ffmpeg
 except ImportError:
-    raise ImportError("ffmpeg-python 尚未安裝，請執行: pip install ffmpeg-python")
+    ffmpeg = None
 
 
 class AudioMerger:

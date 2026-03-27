@@ -11,11 +11,11 @@ Phase 3 實作
 - presentation_tts: 主入口
 """
 
-from .config_manager import ConfigManager, TTSConfig
-from .text_processor import TextProcessor
-from .async_synthesizer import AsyncSynthesizer
-from .audio_merger import AudioMerger
-from .error_handler import (
+from config_manager import ConfigManager, TTSConfig
+from text_processor import TextProcessor
+from async_synthesizer import AsyncSynthesizer
+from audio_merger import AudioMerger
+from error_handler import (
     ErrorHandler,
     TTSError,
     NetworkError,
@@ -25,7 +25,7 @@ from .error_handler import (
     CircuitBreaker,
     RetryPolicy
 )
-from .presentation_tts import PresentationTTS, quick_synthesize
+from presentation_tts import PresentationTTS, quick_synthesize
 
 __version__ = "1.0.0"
 
