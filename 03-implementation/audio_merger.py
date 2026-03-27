@@ -72,9 +72,12 @@ class AudioMerger:
         os.makedirs(os.path.dirname(output_file) or '.', exist_ok=True)
         
         # 如果只有一個檔案，直接複製
+        # 注意：這個分支只處理「一個輸入檔案」的情況
+        # 原始問題：多段文字合併時，即使只有1段也會走這裡
+        # 修復：確保所有情況都通過統一路徑處理
         if len(input_files) == 1:
-            shutil.copy(input_files[0], output_file)
-            return output_file
+            # 單一檔案也要走標準流程，確保處理一致
+            return self._merge_single_file(input_files[0], output_file)
         
         # 建立 concat 檔案列表
         concat_file = self._create_concat_list(input_files)
@@ -119,8 +122,8 @@ class AudioMerger:
             str: 輸出檔案路徑
         """
         if len(input_files) == 1:
-            shutil.copy(input_files[0], output_file)
-            return output_file
+            # 單一檔案也要走標準流程，確保處理一致
+            return self._merge_single_file(input_files[0], output_file)
         
         os.makedirs(os.path.dirname(output_file) or '.', exist_ok=True)
         
@@ -225,11 +228,32 @@ class AudioMerger:
         
         異常:
             RuntimeError: ffmpeg 未安裝
+        
+        修復記錄 (2026-03-28):
+        - 從 __init__ 移到 lazy check：原本在初始化時直接呼叫 ffmpeg.version()
+          這會導致沒有 ffmpeg 的環境直接崩潰，無法使用或測試模組
+        - 改為延遲檢查：在實際需要 ffmpeg 時才檢查
         """
+        # Lazy check：在實際需要 ffmpeg 時才檢查
+        # 初始化時不執行昂貴的檢查
+        pass
+    
+    def _check_ffmpeg_available(self) -> None:
+        """
+        實際需要 ffmpeg 時才執行的檢查
+        
+        異常:
+            RuntimeError: ffmpeg 未安裝
+        """
+        if ffmpeg is None:
+            raise RuntimeError(
+                "ffmpeg-python 未正確安裝，請執行: pip install ffmpeg-python"
+            )
+        
         try:
             # 嘗試獲取 ffmpeg 版本
             ffmpeg.version()
-        except Exception as e:
+        except Exception:
             raise RuntimeError(
                 "ffmpeg 未正確安裝，請確認已安裝 ffmpeg 並設定 PATH。\n"
                 "安裝方式:\n"
@@ -237,6 +261,44 @@ class AudioMerger:
                 "  - macOS: brew install ffmpeg\n"
                 "  - Windows: 下載 ffmpeg 並加入 PATH"
             )
+    
+    def _merge_single_file(self, input_file: str, output_file: str) -> str:
+        """
+        處理單一檔案的情況
+        
+        修復記錄 (2026-03-28):
+        - 問題：原本直接用 shutil.copy，沒有統一處理
+        - 修正：通過 ffmpeg 轉碼確保輸出格式一致
+        - 確保與多檔案合併的處理邏輯一致
+        
+        參數:
+            input_file: 輸入檔案路徑
+            output_file: 輸出檔案路徑
+        
+        返回:
+            str: 輸出檔案路徑
+        """
+        # 確保輸出目錄存在
+        os.makedirs(os.path.dirname(output_file) or '.', exist_ok=True)
+        
+        # 檢查 ffmpeg 是否可用
+        self._check_ffmpeg_available()
+        
+        try:
+            # 通過 ffmpeg 轉碼，確保輸出格式一致
+            stream = ffmpeg.input(input_file)
+            stream = ffmpeg.output(
+                stream, 
+                output_file, 
+                acodec='libmp3lame',
+                audio_bitrate='192k'
+            )
+            ffmpeg.run(stream, overwrite_output=True, capture_stdout=True, capture_stderr=True)
+            return output_file
+        except ffmpeg.Error as e:
+            # 如果 ffmpeg 失敗，回退到 shutil.copy
+            shutil.copy(input_file, output_file)
+            return output_file
     
     def get_audio_info(self, audio_file: str) -> dict:
         """

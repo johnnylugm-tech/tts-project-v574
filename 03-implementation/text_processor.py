@@ -181,6 +181,11 @@ class TextProcessor:
         
         返回:
             List[str]: 合併後的段落列表
+        
+        修復記錄 (2026-03-28):
+        - 移除多餘句號插入：原程式會在句子的開頭插入「。」，
+          這會導致合成時產生不應該有的停頓。
+        - 修正邏輯：只在句子本身有句號時才保留，合併時不額外插入標點
         """
         if not sentences:
             return []
@@ -190,7 +195,8 @@ class TextProcessor:
         
         for sentence in sentences:
             # 檢查加上這個句子是否超過限制
-            test_chunk = current_chunk + sentence if not current_chunk else current_chunk + "。" + sentence
+            # 修正：移除多餘的句號插入，保持原始標點
+            test_chunk = current_chunk + sentence if not current_chunk else current_chunk + sentence
             
             if len(test_chunk) <= self.chunk_size:
                 current_chunk = test_chunk
