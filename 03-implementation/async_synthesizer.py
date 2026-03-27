@@ -19,8 +19,8 @@ try:
 except ImportError:
     raise ImportError("edge-tts 尚未安裝，請執行: pip install edge-tts")
 
-from .config_manager import TTSConfig
-from .error_handler import NetworkError, ServiceError, TTSError
+from config_manager import TTSConfig
+from error_handler import NetworkError, ServiceError, TTSError
 
 
 class AsyncSynthesizer:

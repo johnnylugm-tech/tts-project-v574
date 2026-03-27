@@ -14,7 +14,13 @@ import os
 import tempfile
 from unittest.mock import Mock, patch, MagicMock
 import sys
+import os
+
+# 修正 import 路徑
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.modules['ffmpeg'] = MagicMock()
+
+from audio_merger import AudioMerger
 
 
 class TestAudioMerger:
@@ -22,18 +28,13 @@ class TestAudioMerger:
     
     def test_init(self):
         """測試初始化"""
-        with patch.dict('sys.modules', {'ffmpeg': MagicMock()}):
-            from tts_project_v574_03_implementation.audio_merger import AudioMerger
-            merger = AudioMerger()
-            assert merger is not None
-
-
-class TestCleanup:
+        merger = AudioMerger()
+        assert merger is not None
     """測試清理功能（SEC-02）"""
     
     def test_cleanup_existing_files(self):
         """測試清理存在的檔案"""
-        from tts_project_v574_03_implementation.audio_merger import AudioMerger
+        from audio_merger import AudioMerger
         merger = AudioMerger()
         temp_files = []
         for i in range(3):
@@ -46,7 +47,7 @@ class TestCleanup:
     
     def test_cleanup_nonexistent_files(self):
         """測試清理不存在的檔案"""
-        from tts_project_v574_03_implementation.audio_merger import AudioMerger
+        from audio_merger import AudioMerger
         merger = AudioMerger()
         merger.cleanup(['/nonexistent/file1.mp3', '/nonexistent/file2.mp3'])
 
@@ -56,7 +57,7 @@ class TestCreateConcatList:
     
     def test_create_concat_list(self):
         """測試建立 concat 檔案列表"""
-        from tts_project_v574_03_implementation.audio_merger import AudioMerger
+        from audio_merger import AudioMerger
         merger = AudioMerger()
         temp_files = []
         for i in range(3):
@@ -82,7 +83,7 @@ class TestMerge:
     @patch('tts_project_v574_03_implementation.audio_merger.ffmpeg')
     def test_merge_single_file(self, mock_ffmpeg):
         """測試單一檔案合併"""
-        from tts_project_v574_03_implementation.audio_merger import AudioMerger
+        from audio_merger import AudioMerger
         merger = AudioMerger()
         fd, input_path = tempfile.mkstemp(suffix='.mp3')
         os.close(fd)
@@ -98,14 +99,14 @@ class TestMerge:
     
     def test_merge_empty_list(self):
         """測試空列表合併"""
-        from tts_project_v574_03_implementation.audio_merger import AudioMerger
+        from audio_merger import AudioMerger
         merger = AudioMerger()
         with pytest.raises(ValueError):
             merger.merge([], "output.mp3")
     
     def test_merge_nonexistent_input(self):
         """測試不存在的輸入檔案"""
-        from tts_project_v574_03_implementation.audio_merger import AudioMerger
+        from audio_merger import AudioMerger
         merger = AudioMerger()
         with pytest.raises(FileNotFoundError):
             merger.merge(["/nonexistent/file.mp3"], "output.mp3")

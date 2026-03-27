@@ -6,13 +6,20 @@ Phase 3 實作 - 單元測試
 - SRS.md: FR-09, FR-10, FR-11, FR-12
 - MNT-03: frozen dataclass 配置
 - MNT-04: 每個核心模組單元測試
+
+**模組標註**：SKILL.md - Phase 3: 代碼實現 (SWE.3) - 測試
 """
 
 import pytest
 import json
 import tempfile
 import os
-from tts_project_v574_03_implementation.config_manager import ConfigManager, TTSConfig
+import sys
+import os
+
+# 修正 import 路徑
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config_manager import ConfigManager, TTSConfig
 
 
 class TestTTSConfig:

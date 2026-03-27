@@ -13,7 +13,22 @@ import pytest
 import asyncio
 import os
 import tempfile
+import sys
+import os
+
+# 修正 import 路徑
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Mock edge-tts module
+import sys
+from unittest.mock import MagicMock
+sys.modules['edge_tts'] = MagicMock()
+sys.modules['edge_tts'].Communicate = MagicMock()
+
 from unittest.mock import Mock, patch, MagicMock, AsyncMock
+from config_manager import TTSConfig
+from async_synthesizer import AsyncSynthesizer
+from error_handler import TTSError, NetworkError
 
 
 class TestAsyncSynthesizer:
@@ -32,8 +47,8 @@ class TestAsyncSynthesizer:
     def test_init(self, mock_edge_tts):
         """測試初始化"""
         with patch.dict('sys.modules', {'edge_tts': mock_edge_tts}):
-            from tts_project_v574_03_implementation.config_manager import TTSConfig
-            from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
+            from config_manager import TTSConfig
+            from async_synthesizer import AsyncSynthesizer
             
             config = TTSConfig()
             synthesizer = AsyncSynthesizer(config)
@@ -43,9 +58,9 @@ class TestAsyncSynthesizer:
     
     def test_validate_voice_valid(self):
         """測試驗證有效音色"""
-        from tts_project_v574_03_implementation.config_manager import TTSConfig
-        from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
-        from tts_project_v574_03_implementation.error_handler import TTSError
+        from config_manager import TTSConfig
+        from async_synthesizer import AsyncSynthesizer
+        from error_handler import TTSError
         
         config = TTSConfig()
         synthesizer = AsyncSynthesizer(config)
@@ -56,8 +71,8 @@ class TestAsyncSynthesizer:
     
     def test_validate_voice_allowed_prefix(self):
         """測試允許的音色前綴"""
-        from tts_project_v574_03_implementation.config_manager import TTSConfig
-        from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
+        from config_manager import TTSConfig
+        from async_synthesizer import AsyncSynthesizer
         
         config = TTSConfig()
         synthesizer = AsyncSynthesizer(config)
@@ -71,7 +86,7 @@ class TestAsyncSynthesizer:
     
     def test_allowed_voice_prefixes(self):
         """測試允許的音色前綴列表"""
-        from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
+        from async_synthesizer import AsyncSynthesizer
         
         assert 'zh-' in AsyncSynthesizer.ALLOWED_VOICE_PREFIXES
         assert 'en-' in AsyncSynthesizer.ALLOWED_VOICE_PREFIXES
@@ -90,8 +105,8 @@ class TestSynthesize:
             mock_instance.save = AsyncMock()
             mock_comm.return_value = mock_instance
             
-            from tts_project_v574_03_implementation.config_manager import TTSConfig
-            from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
+            from config_manager import TTSConfig
+            from async_synthesizer import AsyncSynthesizer
             
             config = TTSConfig()
             synthesizer = AsyncSynthesizer(config)
@@ -117,9 +132,9 @@ class TestSynthesize:
             mock_instance.save = AsyncMock(side_effect=asyncio.TimeoutError())
             mock_comm.return_value = mock_instance
             
-            from tts_project_v574_03_implementation.config_manager import TTSConfig
-            from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
-            from tts_project_v574_03_implementation.error_handler import NetworkError
+            from config_manager import TTSConfig
+            from async_synthesizer import AsyncSynthesizer
+            from error_handler import NetworkError
             
             config = TTSConfig()
             synthesizer = AsyncSynthesizer(config)
@@ -152,8 +167,8 @@ class TestSynthesizeStream:
             mock_instance.stream = mock_stream
             mock_comm.return_value = mock_instance
             
-            from tts_project_v574_03_implementation.config_manager import TTSConfig
-            from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
+            from config_manager import TTSConfig
+            from async_synthesizer import AsyncSynthesizer
             
             config = TTSConfig()
             synthesizer = AsyncSynthesizer(config)
@@ -178,7 +193,7 @@ class TestListVoices:
             ]
             mock_comm.get_voices = AsyncMock(return_value=mock_voices)
             
-            from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
+            from async_synthesizer import AsyncSynthesizer
             
             voices = await AsyncSynthesizer.list_voices()
             
@@ -195,7 +210,7 @@ class TestListVoices:
             ]
             mock_comm.get_voices = AsyncMock(return_value=mock_voices)
             
-            from tts_project_v574_03_implementation.async_synthesizer import AsyncSynthesizer
+            from async_synthesizer import AsyncSynthesizer
             
             voices = await AsyncSynthesizer.get_chinese_voices()
             

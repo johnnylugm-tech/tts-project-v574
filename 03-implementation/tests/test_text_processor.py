@@ -9,7 +9,12 @@ Phase 3 實作 - 單元測試
 """
 
 import pytest
-from tts_project_v574_03_implementation.text_processor import TextProcessor
+import sys
+import os
+
+# 修正 import 路徑
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from text_processor import TextProcessor
 
 
 class TestTextProcessor:
